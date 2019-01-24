@@ -13,10 +13,10 @@
     "url": "git+https://github.com/Betterez/btrz-mongo-service.git"
   },
   "keywords": [
-    "request",
-    "response",
-    "handlers",
-    "http"
+    "service",
+    "mongo",
+    "data-access",
+    "validation"
   ],
   "author": "Betterez",
   "license": "MIT",
@@ -30,6 +30,7 @@
     "btrz-service-req-res": "git+ssh://@github.com:Betterez/btrz-service-req-res.git#v1.6.3"
   },
   "devDependencies": {
+    "chance": "^1.0.16",
     "chai": "latest",
     "istanbul": "^0.4.1",
     "mocha": "latest",
