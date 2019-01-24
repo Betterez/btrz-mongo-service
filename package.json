@@ -1,0 +1,38 @@
+{
+  "name": "btrz-mongo-service",
+  "version": "1.0.0",
+  "description": "Betterez specific Mongo data-access service",
+  "main": "index.js",
+  "scripts": {
+    "test": "NODE_ENV=test node_modules/istanbul/lib/cli.js cover node_modules/mocha/bin/_mocha -- --ui bdd -t 5000 test/*.js",
+    "test-w": "NODE_ENV=test node_modules/mocha/bin/mocha -w  test/*.js",
+    "publish": "publish"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Betterez/btrz-mongo-service.git"
+  },
+  "keywords": [
+    "request",
+    "response",
+    "handlers",
+    "http"
+  ],
+  "author": "Betterez",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Betterez/btrz-mongo-service/issues"
+  },
+  "homepage": "https://github.com/Betterez/btrz-mongo-service#readme",
+  "dependencies": {
+    "btrz-simple-dao": "2.6.2",
+    "btrz-query-builder": "git+ssh://git@github.com:Betterez/btrz-query-builder.git#v0.37.0",
+    "btrz-service-req-res": "git+ssh://@github.com:Betterez/btrz-service-req-res.git#v1.6.3"
+  },
+  "devDependencies": {
+    "chai": "latest",
+    "istanbul": "^0.4.1",
+    "mocha": "latest",
+    "publish": "^0.5.0"
+  }
+}
