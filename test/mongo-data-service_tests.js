@@ -33,18 +33,15 @@ describe("Mongo Data Service", () => {
       if (event === "data") {
         this.onDataHandler = handler;
       }
-
       this.counter++;
-
-      if(this.counter >= 3) {
+      if (this.counter >= 3) {
        this.doIt();
       }
-
       return this;
     }
 
     doIt() {
-       this.onDataHandler({"total_documents": 5});
+      this.onDataHandler({"total_documents": 5});
     }
   }
 
@@ -57,18 +54,16 @@ describe("Mongo Data Service", () => {
   beforeEach(() => {
     sandbox = sinon.createSandbox();
     cursor = new CursorMock();
-    //TODO: remove unused mock methods
     dao = {
       for: sandbox.spy(function () { return this; }),
       find: sandbox.spy(function () { return this; }),
       findAggregate: function () { return this; },
       findById: sandbox.stub().resolves(),
       count: sandbox.stub().resolves(0),
-      save: sandbox.spy((data) => Promise.resolve(data)),
+      save: sandbox.stub().resolves(),
       removeById: sandbox.stub().resolves(),
       toArray: sandbox.stub().resolves(),
       toCursor: sandbox.stub().resolves(cursor),
-      objectId: function (id) { return id; }
     };
     config = {};
     service = new MongoDataService(dao, config);
@@ -324,10 +319,22 @@ describe("Mongo Data Service", () => {
     });
   });
 
-  describe("#getCountedList()", () => {
-  });
-
   describe("#getAggregateCount()", () => {
+    function sut() {
+      return service.getAggregateCount(query);
+    }
+
+    let query = null;
+    beforeEach(() => {
+      query = [
+        {$match: {accountId: "account-id"}},
+        { $group: { _id: null, "total_documents": { $sum: 1 } } }
+      ];
+    });
+
+    it("should return a promise with an integer", () => {
+      return expect(sut()).to.eventually.equal(5);
+    });
   });
 
   describe("#getCountedList", () => {
@@ -335,7 +342,6 @@ describe("Mongo Data Service", () => {
       accountId = null,
       filters = null,
       CustomQueryBuilder = null,
-      mongoDataService = null,
       listResult = null,
       countResult = null;
 
@@ -351,8 +357,7 @@ describe("Mongo Data Service", () => {
     });
 
     function sut() {
-      mongoDataService = new MongoDataService(dao, config);
-      return mongoDataService.getCountedList(model, accountId, filters, CustomQueryBuilder);
+      return service.getCountedList(model, accountId, filters, CustomQueryBuilder);
     }
 
     it("should return an object with a list and count", () => {
