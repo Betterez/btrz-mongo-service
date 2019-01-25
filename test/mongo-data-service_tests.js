@@ -177,6 +177,60 @@ describe("Mongo Data Service", () => {
   });
 
   describe("#getExisting()", () => {
+    function sut() {
+      return service.getExisting(TestModel, id);
+    }
+
+    let dbDocument = null;
+    beforeEach(() => {
+      dbDocument = {something: "important"};
+      dao.findById = sandbox.spy(() => Promise.resolve(dbDocument));
+    });
+
+    it("should fail if ID is missing", () => {
+      id = null;
+      return expect(sut())
+        .to.eventually.be.rejectedWith(ValidationError)
+        .to.include({
+          code: "WRONG_DATA",
+          message: "TestModel ID is missing."
+        });
+    });
+
+    it("should fail if ID is an invalid Mongo objectId", () => {
+      id = "something";
+
+      return expect(sut())
+        .to.eventually.be.rejectedWith(ValidationError)
+        .to.include({
+          code: "INVALID_TESTMODEL_ID",
+          message: "TestModel ID is invalid."
+        });
+    });
+
+    it("should call the dao findById with the Model and id", async () => {
+      await sut();
+      expect(dao.for.calledOnce).to.equal(true);
+      expect(dao.for.firstCall.args[0]).to.be.eql(TestModel);
+      expect(dao.findById.calledOnce).to.equal(true);
+      expect(dao.findById.firstCall.args[0]).to.equal(id);
+    });
+
+    it("should return the document found from the database", async () => {
+      const found = await sut();
+      expect(found).to.deep.equal(dbDocument);
+    });
+
+    it("should fail if document was not found", () => {
+      dbDocument = null;
+
+      return expect(sut())
+        .to.eventually.be.rejectedWith(ValidationError)
+        .to.include({
+          code: "NOT_FOUND",
+          message: "TestModel not found"
+        });
+    });
   });
 
   describe("#update()", () => {
