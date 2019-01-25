@@ -34,6 +34,7 @@ node_modules
 .node_repl_history
 
 # test results
+/test-results
 .nyc_output
 
 # no lock
