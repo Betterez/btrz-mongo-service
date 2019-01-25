@@ -285,6 +285,15 @@ describe("Mongo Data Service", () => {
         });
     });
 
+    it("should fail if update data is missing", () => {
+      data = null;
+      return expect(sut())
+        .to.eventually.be.rejectedWith(Error)
+        .to.include({
+          message: "The data is required for update"
+        });
+    });
+
     it("should call the dao findById with the Model and id", async () => {
       await sut();
       expect(dao.for.calledOnce).to.equal(true);
