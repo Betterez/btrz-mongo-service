@@ -329,4 +329,50 @@ describe("Mongo Data Service", () => {
 
   describe("#getAggregateCount()", () => {
   });
+
+  describe("#getCountedList", () => {
+    let model = null,
+      accountId = null,
+      filters = null,
+      CustomQueryBuilder = null,
+      mongoDataService = null,
+      listResult = null,
+      countResult = null;
+
+    beforeEach(() => {
+      accountId = "123123123";
+      filters = {},
+      CustomQueryBuilder = {};
+      model = new TestModel();
+      listResult = [{_id: "1"}, {_id: "2"}];
+      countResult = listResult.length;
+      dao.toArray = sinon.spy(() => Promise.resolve(listResult));
+      dao.count = sinon.spy(() => Promise.resolve(countResult));
+    });
+
+    function sut() {
+      mongoDataService = new MongoDataService(dao, config);
+      return mongoDataService.getCountedList(model, accountId, filters, CustomQueryBuilder);
+    }
+
+    it("should return an object with a list and count", () => {
+      return sut()
+        .then((result) => {
+          expect(result).to.deep.equal({
+            list: listResult,
+            count: countResult
+          });
+        });
+    })
+
+    it("should call count and find with same query and options", () => {
+      return sut()
+        .then(() => {
+          expect(dao.find.callCount).to.equal(1);
+          expect(dao.find.firstCall.args).to.deep.equal([{accountId}, {}]);
+          expect(dao.count.callCount).to.equal(1);
+          expect(dao.count.firstCall.args).to.deep.equal([{accountId}]);
+        });
+    });
+  });
 });
