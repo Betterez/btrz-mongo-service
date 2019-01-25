@@ -1,9 +1,15 @@
 "use strict";
 
 describe("Mongo Data Service", () => {
-  const {MongoDataService} = require("../index");
-  const {expect} = require("chai");
   const sinon = require("sinon");
+  const chai = require("chai");
+  const chaiAsPromised = require("chai-as-promised");
+  chai.use(chaiAsPromised);
+  const {expect} = chai;
+
+  const {MongoDataService} = require("../index");
+  const {SimpleDao} = require("btrz-simple-dao");
+  const {ValidationError} = require("btrz-service-req-res");
 
   class TestModel {
 
@@ -38,6 +44,7 @@ describe("Mongo Data Service", () => {
   let dao = null;
   let config = null;
   let service = null;
+  let id = null;
   beforeEach(() => {
     sandbox = sinon.createSandbox();
     cursor = new CursorMock();
@@ -46,16 +53,17 @@ describe("Mongo Data Service", () => {
       for: sandbox.spy(function () { return this; }),
       find: sandbox.spy(function () { return this; }),
       findAggregate: function () { return this; },
-      findById: sandbox.spy(function (id) { return Promise.resolve({}); }),
-      count: sandbox.spy(function () { return Promise.resolve(0); }),
-      save: sandbox.spy(function (data) { return Promise.resolve(data); }),
-      removeById: sandbox.spy(function (id) { return Promise.resolve({}); }),
-      toArray: function () { return Promise.resolve(); },
-      toCursor: function () {return Promise.resolve(cursor); },
+      findById: sandbox.stub().resolves(),
+      count: sandbox.stub().resolves(0),
+      save: sandbox.spy((data) => Promise.resolve(data)),
+      removeById: sandbox.stub().resolves(),
+      toArray: sandbox.stub().resolves(),
+      toCursor: sandbox.stub().resolves(cursor),
       objectId: function (id) { return id; }
     };
     config = {};
     service = new MongoDataService(dao, config);
+    id = SimpleDao.objectId().toString();
   });
 
   it("should be called MongoDataService", () => {
@@ -89,23 +97,83 @@ describe("Mongo Data Service", () => {
 
   describe("#getById()", () => {
     function sut() {
-      service.getById();
+      return service.getById(TestModel, id);
     }
 
+    let dbDocument = null;
+    beforeEach(() => {
+      dbDocument = {something: "important"};
+      dao.findById = sandbox.stub().resolves(dbDocument);
+    });
+
     it("should fail if ID is missing", () => {
+      id = null;
+      return expect(sut())
+        .to.eventually.be.rejectedWith(ValidationError)
+        .to.include({
+          code: "WRONG_DATA",
+          message: "TestModel ID is missing."
+        });
     });
 
-    it("should fail if ID is invalid", () => {
+    it("should fail if ID is an invalid Mongo objectId", () => {
+      id = "something";
+
+      return expect(sut())
+        .to.eventually.be.rejectedWith(ValidationError)
+        .to.include({
+          code: "INVALID_TESTMODEL_ID",
+          message: "TestModel ID is invalid."
+        });
     });
 
-    it("should call the dao findById with the id", () => {
+    it("should call the dao findById with the Model and id", async () => {
+      await sut();
+      expect(dao.for.calledOnce).to.equal(true);
+      expect(dao.for.firstCall.args[0]).to.be.eql(TestModel);
+      expect(dao.findById.calledOnce).to.equal(true);
+      expect(dao.findById.firstCall.args[0]).to.equal(id);
     });
 
-    it("should return the model found", () => {
+    it("should return the document found from the database", async () => {
+      const found = await sut();
+      expect(found).to.deep.equal(dbDocument);
     });
   });
 
   describe("#delete()", () => {
+    function sut() {
+      return service.delete(TestModel, id);
+    }
+
+    it("should fail if ID is missing", () => {
+      id = null;
+      return expect(sut())
+        .to.eventually.be.rejectedWith(ValidationError)
+        .to.include({
+          code: "WRONG_DATA",
+          message: "TestModel ID is missing."
+        });
+    });
+
+    it("should fail if ID is an invalid Mongo objectId", () => {
+      id = "something";
+
+      return expect(sut())
+        .to.eventually.be.rejectedWith(ValidationError)
+        .to.include({
+          code: "INVALID_TESTMODEL_ID",
+          message: "TestModel ID is invalid."
+        });
+    });
+
+    it("should call the dao findById with the Model and id", async () => {
+      await sut();
+      expect(dao.for.calledOnce).to.equal(true);
+      expect(dao.for.firstCall.args[0]).to.be.eql(TestModel);
+      expect(dao.removeById.calledOnce).to.equal(true);
+      expect(dao.removeById.firstCall.args[0]).to.equal(id);
+    });
   });
 
   describe("#getExisting()", () => {

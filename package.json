@@ -32,6 +32,7 @@
   "devDependencies": {
     "chance": "^1.0.16",
     "chai": "latest",
+    "chai-as-promised": "latest",
     "nyc": "^11.4.1",
     "mocha": "latest",
     "mocha-multi": "latest",
