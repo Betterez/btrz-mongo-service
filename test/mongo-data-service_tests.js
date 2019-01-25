@@ -112,7 +112,8 @@ describe("Mongo Data Service", () => {
         .to.eventually.be.rejectedWith(ValidationError)
         .to.include({
           code: "WRONG_DATA",
-          message: "TestModel ID is missing."
+          message: "TestModel ID is missing.",
+          status: 400
         });
     });
 
@@ -123,7 +124,8 @@ describe("Mongo Data Service", () => {
         .to.eventually.be.rejectedWith(ValidationError)
         .to.include({
           code: "INVALID_TESTMODEL_ID",
-          message: "TestModel ID is invalid."
+          message: "TestModel ID is invalid.",
+          status: 400
         });
     });
 
@@ -152,7 +154,8 @@ describe("Mongo Data Service", () => {
         .to.eventually.be.rejectedWith(ValidationError)
         .to.include({
           code: "WRONG_DATA",
-          message: "TestModel ID is missing."
+          message: "TestModel ID is missing.",
+          status: 400
         });
     });
 
@@ -163,7 +166,8 @@ describe("Mongo Data Service", () => {
         .to.eventually.be.rejectedWith(ValidationError)
         .to.include({
           code: "INVALID_TESTMODEL_ID",
-          message: "TestModel ID is invalid."
+          message: "TestModel ID is invalid.",
+          status: 400
         });
     });
 
@@ -193,7 +197,8 @@ describe("Mongo Data Service", () => {
         .to.eventually.be.rejectedWith(ValidationError)
         .to.include({
           code: "WRONG_DATA",
-          message: "TestModel ID is missing."
+          message: "TestModel ID is missing.",
+          status: 400
         });
     });
 
@@ -204,7 +209,8 @@ describe("Mongo Data Service", () => {
         .to.eventually.be.rejectedWith(ValidationError)
         .to.include({
           code: "INVALID_TESTMODEL_ID",
-          message: "TestModel ID is invalid."
+          message: "TestModel ID is invalid.",
+          status: 400
         });
     });
 
@@ -228,7 +234,8 @@ describe("Mongo Data Service", () => {
         .to.eventually.be.rejectedWith(ValidationError)
         .to.include({
           code: "NOT_FOUND",
-          message: "TestModel not found"
+          message: "TestModel not found",
+          status: 404
         });
     });
   });
