@@ -12,7 +12,16 @@ describe("Mongo Data Service", () => {
   const {ValidationError} = require("btrz-service-req-res");
 
   class TestModel {
-
+    static factory(data) {
+      const model = new TestModel();
+      model.something = data.something;
+      return model;
+    }
+    static update(model, dto) {
+      model.something = dto.something;
+      model.updatedAt = "now";
+      return model;
+    }
   }
 
   class CursorMock {
@@ -241,6 +250,69 @@ describe("Mongo Data Service", () => {
   });
 
   describe("#update()", () => {
+    function sut() {
+      return service.update(TestModel, id, data);
+    }
+
+    let existingDocument = null;
+    let data = null;
+    beforeEach(() => {
+      existingDocument = {something: "important"};
+      data = {something: "new"};
+      dao.findById = sandbox.spy(() => Promise.resolve(existingDocument));
+    });
+
+    it("should fail if ID is missing", () => {
+      id = null;
+      return expect(sut())
+        .to.eventually.be.rejectedWith(ValidationError)
+        .to.include({
+          code: "WRONG_DATA",
+          message: "TestModel ID is missing.",
+          status: 400
+        });
+    });
+
+    it("should fail if ID is an invalid Mongo objectId", () => {
+      id = "something";
+
+      return expect(sut())
+        .to.eventually.be.rejectedWith(ValidationError)
+        .to.include({
+          code: "INVALID_TESTMODEL_ID",
+          message: "TestModel ID is invalid.",
+          status: 400
+        });
+    });
+
+    it("should call the dao findById with the Model and id", async () => {
+      await sut();
+      expect(dao.for.calledOnce).to.equal(true);
+      expect(dao.for.firstCall.args[0]).to.be.eql(TestModel);
+      expect(dao.findById.calledOnce).to.equal(true);
+      expect(dao.findById.firstCall.args[0]).to.equal(id);
+    });
+
+    it("should fail if document was not found", () => {
+      existingDocument = null;
+
+      return expect(sut())
+        .to.eventually.be.rejectedWith(ValidationError)
+        .to.include({
+          code: "NOT_FOUND",
+          message: "TestModel not found",
+          status: 404
+        });
+    });
+
+    it("should update and save the document found", async () => {
+      await sut();
+      expect(dao.save.calledOnce).to.equal(true);
+      expect(dao.save.firstCall.args[0]).to.deep.equal({
+        something: "new",
+        updatedAt: "now"
+      });
+    });
   });
 
   describe("#getCountedList()", () => {
