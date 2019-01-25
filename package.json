@@ -4,8 +4,8 @@
   "description": "Betterez specific Mongo data-access service",
   "main": "index.js",
   "scripts": {
-    "test": "NODE_ENV=test node_modules/istanbul/lib/cli.js cover node_modules/mocha/bin/_mocha -- --ui bdd -t 5000 test/*.js",
-    "test-w": "NODE_ENV=test node_modules/mocha/bin/mocha -w  test/*.js",
+    "test": "NODE_ENV=test multi='xunit=test-results/xunit.xml spec=-' nyc -r=text-summary -r=lcov -r=cobertura --clean --report-dir=./test-results mocha --ui bdd -R mocha-multi -t 50000 test/*.js --exit",
+    "test-w": "NODE_ENV=test node_modules/mocha/bin/mocha -w test/*.js",
     "publish": "publish"
   },
   "repository": {
@@ -33,7 +33,9 @@
     "chance": "^1.0.16",
     "chai": "latest",
     "istanbul": "^0.4.1",
+    "nyc": "^11.4.1",
     "mocha": "latest",
+    "mocha-multi": "latest",
     "publish": "^0.5.0"
   }
 }

@@ -33,6 +33,8 @@ node_modules
 # Optional REPL history
 .node_repl_history
 
-/test-results
+# test results
+.nyc_output
 
+# no lock
 package-lock.json
