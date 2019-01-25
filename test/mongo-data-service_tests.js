@@ -5,6 +5,10 @@ describe("Mongo Data Service", () => {
   const {expect} = require("chai");
   const sinon = require("sinon");
 
+  class TestModel {
+
+  }
+
   class CursorMock {
     constructor () {
       this.counter = 0;
@@ -37,6 +41,7 @@ describe("Mongo Data Service", () => {
   beforeEach(() => {
     sandbox = sinon.createSandbox();
     cursor = new CursorMock();
+    //TODO: remove unused mock methods
     dao = {
       for: sandbox.spy(function () { return this; }),
       find: sandbox.spy(function () { return this; }),
@@ -83,6 +88,21 @@ describe("Mongo Data Service", () => {
   });
 
   describe("#getById()", () => {
+    function sut() {
+      service.getById();
+    }
+
+    it("should fail if ID is missing", () => {
+    });
+
+    it("should fail if ID is invalid", () => {
+    });
+
+    it("should call the dao findById with the id", () => {
+    });
+
+    it("should return the model found", () => {
+    });
   });
 
   describe("#delete()", () => {
