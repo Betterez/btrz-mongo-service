@@ -10,20 +10,29 @@ describe("Mongo Data Service", () => {
 
   describe("constructor", () => {
     function sut() {
-      return new MongoDataService(dependencies);
+      return new MongoDataService(dao, config);
     }
 
-    let dependencies = null;
+    let dao = null,
+      config = null;
     beforeEach(() => {
-      dependencies = {
-        dao: {for(){}},
-        config: {}
-      };
+      dao = {for(){}};
+      config = {};
     });
 
     it("should fail if dao is not in dependencies", () => {
-      Reflect.deleteProperty(dependencies, "dao");
+      dao = null;
       expect(sut).to.throw("dao is mandatory for MongoDataService");
+    });
+
+    it("should fail if dao in dependencies is not a valid dao (has for method)", () => {
+      dao.for = null;
+      expect(sut).to.throw("dao is mandatory for MongoDataService");
+    });
+
+    it("should fail if config is not in dependencies", () => {
+      config = null;
+      expect(sut).to.throw("config is mandatory for MongoDataService");
     });
   });
 
