@@ -3,6 +3,55 @@
 describe("Mongo Data Service", () => {
   const {MongoDataService} = require("../index");
   const {expect} = require("chai");
+  const sinon = require("sinon");
+
+  class CursorMock {
+    constructor () {
+      this.counter = 0;
+    }
+
+    on (event, handler) {
+      if (event === "data") {
+        this.onDataHandler = handler;
+      }
+
+      this.counter++;
+
+      if(this.counter >= 3) {
+       this.doIt();
+      }
+
+      return this;
+    }
+
+    doIt() {
+       this.onDataHandler({"total_documents": 5});
+    }
+  }
+
+  let sandbox = null;
+  let cursor = null;
+  let dao = null;
+  let config = null;
+  let service = null;
+  beforeEach(() => {
+    sandbox = sinon.createSandbox();
+    cursor = new CursorMock();
+    dao = {
+      for: sandbox.spy(function () { return this; }),
+      find: sandbox.spy(function () { return this; }),
+      findAggregate: function () { return this; },
+      findById: sandbox.spy(function (id) { return Promise.resolve({}); }),
+      count: sandbox.spy(function () { return Promise.resolve(0); }),
+      save: sandbox.spy(function (data) { return Promise.resolve(data); }),
+      removeById: sandbox.spy(function (id) { return Promise.resolve({}); }),
+      toArray: function () { return Promise.resolve(); },
+      toCursor: function () {return Promise.resolve(cursor); },
+      objectId: function (id) { return id; }
+    };
+    config = {};
+    service = new MongoDataService(dao, config);
+  });
 
   it("should be called MongoDataService", () => {
     expect(MongoDataService.name).to.equal("MongoDataService");
@@ -12,13 +61,6 @@ describe("Mongo Data Service", () => {
     function sut() {
       return new MongoDataService(dao, config);
     }
-
-    let dao = null,
-      config = null;
-    beforeEach(() => {
-      dao = {for(){}};
-      config = {};
-    });
 
     it("should fail if dao is not in dependencies", () => {
       dao = null;
@@ -33,6 +75,10 @@ describe("Mongo Data Service", () => {
     it("should fail if config is not in dependencies", () => {
       config = null;
       expect(sut).to.throw("config is mandatory for MongoDataService");
+    });
+
+    it("should create an instance of MongoDataService", () => {
+      expect(sut()).to.be.an.instanceof(MongoDataService);
     });
   });
 
