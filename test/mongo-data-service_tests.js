@@ -24,36 +24,13 @@ describe("Mongo Data Service", () => {
     }
   }
 
-  class CursorMock {
-    constructor () {
-      this.counter = 0;
-    }
-
-    on (event, handler) {
-      if (event === "data") {
-        this.onDataHandler = handler;
-      }
-      this.counter++;
-      if (this.counter >= 3) {
-       this.doIt();
-      }
-      return this;
-    }
-
-    doIt() {
-      this.onDataHandler({"total_documents": 5});
-    }
-  }
-
   let sandbox = null;
-  let cursor = null;
   let dao = null;
   let config = null;
   let service = null;
   let id = null;
   beforeEach(() => {
     sandbox = sinon.createSandbox();
-    cursor = new CursorMock();
     dao = {
       for: sandbox.spy(function () { return this; }),
       find: sandbox.spy(function () { return this; }),
@@ -63,7 +40,6 @@ describe("Mongo Data Service", () => {
       save: sandbox.stub().resolves(),
       removeById: sandbox.stub().resolves(),
       toArray: sandbox.stub().resolves(),
-      toCursor: sandbox.stub().resolves(cursor),
     };
     config = {};
     service = new MongoDataService(dao, config);
@@ -324,8 +300,32 @@ describe("Mongo Data Service", () => {
       return service.getAggregateCount(query);
     }
 
+    class ResultsCursorMock {
+      constructor () {
+        this.counter = 0;
+      }
+  
+      on(event, handler) {
+        if (event === "data") {
+          this.onDataHandler = handler;
+        }
+        this.counter++;
+        if (this.counter >= 3) {
+         this.doIt();
+        }
+        return this;
+      }
+
+      doIt() {
+        this.onDataHandler({"total_documents": 5});
+      }
+    }
+
     let query = null;
+    let cursor = null;
     beforeEach(() => {
+      cursor = new ResultsCursorMock();
+      dao.toCursor = sandbox.spy(() => Promise.resolve(cursor));
       query = [
         {$match: {accountId: "account-id"}},
         { $group: { _id: null, "total_documents": { $sum: 1 } } }
@@ -334,6 +334,28 @@ describe("Mongo Data Service", () => {
 
     it("should return a promise with an integer", () => {
       return expect(sut()).to.eventually.equal(5);
+    });
+
+    it("should return a rejected promise if cursor fails", () => {
+      cursor.on = function (event, handler) {
+        if (event === "error") {
+          handler(new Error("mongo cursor error"));
+        }
+        return this;
+      };
+      return expect(sut())
+        .to.eventually.be.rejectedWith(Error)
+        .to.include({message: "mongo cursor error"});
+    });
+
+    it("should resolve to zero if cursor ends with no results", () => {
+      cursor.on = function (event, handler) {
+        if (event === "end") {
+          handler();
+        }
+        return this;
+      };
+      return expect(sut()).to.eventually.equal(0);
     });
   });
 
@@ -352,8 +374,8 @@ describe("Mongo Data Service", () => {
       model = new TestModel();
       listResult = [{_id: "1"}, {_id: "2"}];
       countResult = listResult.length;
-      dao.toArray = sinon.spy(() => Promise.resolve(listResult));
-      dao.count = sinon.spy(() => Promise.resolve(countResult));
+      dao.toArray = sandbox.spy(() => Promise.resolve(listResult));
+      dao.count = sandbox.spy(() => Promise.resolve(countResult));
     });
 
     function sut() {
