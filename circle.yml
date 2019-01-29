@@ -19,6 +19,8 @@ jobs:
           path: ./test-results/lcov-report
           prefix: lcov-1coverage
   publish:
+    docker:
+      - image: circleci/node:8.12.0-jessie
     steps:
       - run: 
           name: Publish to npm
