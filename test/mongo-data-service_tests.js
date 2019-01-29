@@ -40,6 +40,7 @@ describe("Mongo Data Service", () => {
       save: sandbox.stub().resolves(),
       removeById: sandbox.stub().resolves(),
       toArray: sandbox.stub().resolves(),
+      objectId: sandbox.spy(_id => SimpleDao.objectId(_id))
     };
     config = {};
     service = new MongoDataService(dao, config);
@@ -360,17 +361,27 @@ describe("Mongo Data Service", () => {
   });
 
   describe("#getCountedList", () => {
-    let model = null,
-      accountId = null,
-      filters = null,
-      CustomQueryBuilder = null,
-      listResult = null,
-      countResult = null;
+    let model = null;
+    let accountId = null;
+    let filters = null;
+    let queryBuilder = null;
+    let listResult = null;
+    let countResult = null;
+
+    class QueryBuilder {
+      build(_accountId, _filters) {
+        return {accountId};
+      }
+
+      static buildQueryOptions(_filters, _pageSize) {
+        return {};
+      }
+    }
 
     beforeEach(() => {
       accountId = "123123123";
       filters = {},
-      CustomQueryBuilder = {};
+      queryBuilder = new QueryBuilder();
       model = new TestModel();
       listResult = [{_id: "1"}, {_id: "2"}];
       countResult = listResult.length;
@@ -379,7 +390,7 @@ describe("Mongo Data Service", () => {
     });
 
     function sut() {
-      return service.getCountedList(model, accountId, filters, CustomQueryBuilder);
+      return service.getCountedList(model, accountId, filters, queryBuilder);
     }
 
     it("should return an object with a list and count", () => {

@@ -25,9 +25,7 @@
   },
   "homepage": "https://github.com/Betterez/btrz-mongo-service#readme",
   "dependencies": {
-    "btrz-simple-dao": "2.6.2",
-    "btrz-query-builder": "git+ssh://git@github.com:Betterez/btrz-query-builder.git#v0.37.0",
-    "btrz-service-req-res": "git+ssh://@github.com:Betterez/btrz-service-req-res.git#v1.6.3"
+    "btrz-service-req-res": "latest"
   },
   "devDependencies": {
     "chance": "^1.0.16",
@@ -37,6 +35,7 @@
     "mocha": "latest",
     "mocha-multi": "latest",
     "sinon": "latest",
-    "publish": "^0.5.0"
+    "publish": "^0.5.0",
+    "btrz-simple-dao": "latest"
   }
 }
