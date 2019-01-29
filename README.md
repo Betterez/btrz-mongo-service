@@ -14,7 +14,7 @@ This was causing many duplicated methods between data-services and also many wra
 
 The solution is to have this single mongo data-access service, that implements several methods in a Model-independent way, and removes some unnecessary wrapping.
 
-Many APIs were checking for valid Mongo IDs in every handler, via SimpleDao or via JOI. ALso many were re-implementing validation for "existing" models not found.
+Many APIs were checking for valid Mongo IDs in every handler, via SimpleDao or via JOI. Also many were re-implementing validation for "existing" models not found.
 
 This Service provides Mongo ID validation and "existing" checks, integrated in the right methods.
 
