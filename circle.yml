@@ -7,9 +7,6 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Delete node_modules
-          command: 'sudo rm -R ./node_modules'
-      - run:
           name: Install npm
           command: npm install --no-package-lock
   test:
