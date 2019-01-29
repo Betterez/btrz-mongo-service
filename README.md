@@ -33,4 +33,4 @@ The Model is just a method parameter (always the first one).
 
 Each available method is documented with JSDoc in [mongo-data-service.js](https://github.com/Betterez/btrz-mongo-service/blob/master/lib/mongo-data-service.js).
 
-You might notice that some methods (getCount, save, delete) that are available in btrz-inventory-api data-services are not implemented here. The reason is they were just a SimpleDao call, there was nothing extra.
+You might notice that some methods (getCount, save, delete) that are available in btrz-api-inventory data-services are not implemented here. The reason is they were just a SimpleDao call, there was nothing extra.
