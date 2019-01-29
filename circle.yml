@@ -1,6 +1,6 @@
 version: 2
-jobs:
-  build:
+jobs:     
+  test:
     working_directory: ~/btrz-mongo-service
     docker:
       - image: circleci/node:8.12.0-jessie
@@ -9,12 +9,6 @@ jobs:
       - run:
           name: Install npm
           command: npm install --no-package-lock
-  test:
-    working_directory: ~/btrz-mongo-service
-    docker:
-      - image: circleci/node:8.12.0-jessie
-    steps:
-      - checkout
       - run:
           name: Test
           command: npm test
@@ -27,12 +21,9 @@ jobs:
 
 workflows:
   version: 2
-  build_and_test:
+  test:
     jobs:
-      - build
       - test:
-          requires:
-            - build
           filters:
             branches:
               only: master
