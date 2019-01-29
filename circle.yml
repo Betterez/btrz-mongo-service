@@ -1,9 +1,41 @@
-machine:
-  node:
-    version: 8.11.4
-deployment:
-  npm:
-    branch: master
-    commands:
-      - echo -e "$NPM_USERNAME\n$NPM_PASSWORD\n$NPM_EMAIL" | npm login
-      - npm run publish
+version: 2
+jobs:
+  build:
+    working_directory: ~/btrz-mongo-service
+    docker:
+      - image: circleci/node:8.12.0-jessie
+    steps:
+      - checkout
+      - run:
+          name: Delete node_modules
+          command: 'sudo rm -R ./node_modules'
+      - run:
+          name: Install npm
+          command: npm install --no-package-lock
+  test:
+    working_directory: ~/btrz-mongo-service
+    docker:
+      - image: circleci/node:8.12.0-jessie
+    steps:
+      - checkout
+      - run:
+          name: Test
+          command: npm test
+      - store_artifacts:
+          path: ./test-results/cobertura-coverage.xml
+          prefix: cobertura-coverage
+      - store_artifacts:
+          path: ./test-results/lcov-report
+          prefix: lcov-1coverage
+
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+      - build
+      - test:
+          requires:
+            - build
+          filters:
+            branches:
+              only: master
