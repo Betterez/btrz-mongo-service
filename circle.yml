@@ -18,12 +18,24 @@ jobs:
       - store_artifacts:
           path: ./test-results/lcov-report
           prefix: lcov-1coverage
+  publish:
+    run: 
+      name: Publish to npm
+      command: |
+        echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
+        npm run publish 
 
 workflows:
   version: 2
-  test:
+  test_and_publish:
     jobs:
       - test:
+          filters:
+            branches:
+              only: master
+      - publish:
+          requires:
+            - test
           filters:
             branches:
               only: master
