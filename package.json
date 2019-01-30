@@ -1,13 +1,12 @@
 {
   "name": "btrz-mongo-service",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Betterez specific Mongo data-access service",
   "main": "index.js",
   "scripts": {
     "test": "NODE_ENV=test multi='xunit=test-results/xunit.xml spec=-' nyc -r=text-summary -r=lcov -r=cobertura --clean --report-dir=./test-results mocha --ui bdd -R mocha-multi -t 50000 test/*.js --exit",
     "test-w": "NODE_ENV=test node_modules/mocha/bin/mocha -w test/*.js",
-    "lint": "eslint --ext .js, src lib",
-    "publish": "publish"
+    "lint": "eslint --ext .js, src lib"
   },
   "repository": {
     "type": "git",
@@ -36,7 +35,6 @@
     "mocha": "latest",
     "mocha-multi": "latest",
     "sinon": "latest",
-    "publish": "^0.5.0",
     "btrz-simple-dao": "latest",
     "eslint": "^3.18.0",
     "eslint-plugin-mocha": "^4.9.0"
