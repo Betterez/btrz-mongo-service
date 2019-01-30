@@ -1,5 +1,5 @@
 version: 2
-jobs:     
+jobs:
   publish:
     working_directory: ~/btrz-mongo-service
     docker:
@@ -10,6 +10,9 @@ jobs:
           name: Install npm
           command: npm install --no-package-lock
       - run:
+          name: Run lint
+          command: npm run lint
+      - run:
           name: Test
           command: npm test
       - store_artifacts:
@@ -18,12 +21,12 @@ jobs:
       - store_artifacts:
           path: ./test-results/lcov-report
           prefix: lcov-1coverage
-      - run: 
+      - run:
           name: Publish to npm
           command: |
             echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
-            npm run publish 
-      
+            npm run publish
+
 
 workflows:
   version: 2
