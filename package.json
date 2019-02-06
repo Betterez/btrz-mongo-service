@@ -4,9 +4,8 @@
   "description": "Betterez specific Mongo data-access service",
   "main": "index.js",
   "scripts": {
-    "test": "NODE_ENV=test multi='xunit=test-results/xunit.xml spec=-' nyc -r=text-summary -r=lcov -r=cobertura --clean --report-dir=./test-results mocha --ui bdd -R mocha-multi -t 50000 test/*.js --exit",
-    "test-w": "NODE_ENV=test node_modules/mocha/bin/mocha -w test/*.js",
-    "publish": "publish"
+    "test": "NODE_ENV=test mocha --ui bdd -t 50000 test/*.js --exit",
+    "test-w": "NODE_ENV=test node_modules/mocha/bin/mocha -w test/*.js"
   },
   "repository": {
     "type": "git",
@@ -31,11 +30,8 @@
     "chance": "^1.0.16",
     "chai": "latest",
     "chai-as-promised": "latest",
-    "nyc": "^11.4.1",
     "mocha": "latest",
-    "mocha-multi": "latest",
     "sinon": "latest",
-    "publish": "^0.5.0",
     "btrz-simple-dao": "latest"
   }
 }
