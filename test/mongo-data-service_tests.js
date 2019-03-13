@@ -9,7 +9,7 @@ describe("Mongo Data Service", () => {
 
   const {MongoDataService} = require("../index");
   const {SimpleDao} = require("btrz-simple-dao");
-  const {ValidationError} = require("btrz-service-req-res");
+  const {ValidationError} = require("btrz-http-service");
 
   class TestModel {
     static factory(data) {
@@ -305,7 +305,7 @@ describe("Mongo Data Service", () => {
       constructor () {
         this.counter = 0;
       }
-  
+
       on(event, handler) {
         if (event === "data") {
           this.onDataHandler = handler;
