@@ -1,5 +1,3 @@
-"use strict";
-
 describe("Mongo Data Service", () => {
   const sinon = require("sinon");
   const chai = require("chai");
@@ -9,7 +7,6 @@ describe("Mongo Data Service", () => {
 
   const {MongoDataService} = require("../index");
   const {SimpleDao} = require("btrz-simple-dao");
-  const {ValidationError} = require("btrz-http-service");
 
   class TestModel {
     static factory(data) {
@@ -90,11 +87,11 @@ describe("Mongo Data Service", () => {
     it("should fail if ID is missing", () => {
       id = null;
       return expect(sut())
-        .to.eventually.be.rejectedWith(ValidationError)
+        .to.eventually.be.rejectedWith(Error)
         .to.include({
-          code: "WRONG_DATA",
-          message: "TestModel ID is missing.",
-          status: 400
+          type: "INVALID",
+          code: "INVALID_TESTMODEL_ID",
+          message: "TestModel ID is invalid.",
         });
     });
 
@@ -102,11 +99,11 @@ describe("Mongo Data Service", () => {
       id = "something";
 
       return expect(sut())
-        .to.eventually.be.rejectedWith(ValidationError)
+        .to.eventually.be.rejectedWith(Error)
         .to.include({
+          type: "INVALID",
           code: "INVALID_TESTMODEL_ID",
           message: "TestModel ID is invalid.",
-          status: 400
         });
     });
 
@@ -132,11 +129,11 @@ describe("Mongo Data Service", () => {
     it("should fail if ID is missing", () => {
       id = null;
       return expect(sut())
-        .to.eventually.be.rejectedWith(ValidationError)
+        .to.eventually.be.rejectedWith(Error)
         .to.include({
-          code: "WRONG_DATA",
-          message: "TestModel ID is missing.",
-          status: 400
+          type: "INVALID",
+          code: "INVALID_TESTMODEL_ID",
+          message: "TestModel ID is invalid.",
         });
     });
 
@@ -144,11 +141,11 @@ describe("Mongo Data Service", () => {
       id = "something";
 
       return expect(sut())
-        .to.eventually.be.rejectedWith(ValidationError)
+        .to.eventually.be.rejectedWith(Error)
         .to.include({
+          type: "INVALID",
           code: "INVALID_TESTMODEL_ID",
           message: "TestModel ID is invalid.",
-          status: 400
         });
     });
 
@@ -175,11 +172,11 @@ describe("Mongo Data Service", () => {
     it("should fail if ID is missing", () => {
       id = null;
       return expect(sut())
-        .to.eventually.be.rejectedWith(ValidationError)
+        .to.eventually.be.rejectedWith(Error)
         .to.include({
-          code: "WRONG_DATA",
-          message: "TestModel ID is missing.",
-          status: 400
+          type: "INVALID",
+          code: "INVALID_TESTMODEL_ID",
+          message: "TestModel ID is invalid.",
         });
     });
 
@@ -187,11 +184,11 @@ describe("Mongo Data Service", () => {
       id = "something";
 
       return expect(sut())
-        .to.eventually.be.rejectedWith(ValidationError)
+        .to.eventually.be.rejectedWith(Error)
         .to.include({
+          type: "INVALID",
           code: "INVALID_TESTMODEL_ID",
           message: "TestModel ID is invalid.",
-          status: 400
         });
     });
 
@@ -212,11 +209,11 @@ describe("Mongo Data Service", () => {
       dbDocument = null;
 
       return expect(sut())
-        .to.eventually.be.rejectedWith(ValidationError)
+        .to.eventually.be.rejectedWith(Error)
         .to.include({
+          type: "NOT_FOUND",
           code: "NOT_FOUND",
           message: "TestModel not found",
-          status: 404
         });
     });
   });
@@ -237,11 +234,11 @@ describe("Mongo Data Service", () => {
     it("should fail if ID is missing", () => {
       id = null;
       return expect(sut())
-        .to.eventually.be.rejectedWith(ValidationError)
+        .to.eventually.be.rejectedWith(Error)
         .to.include({
-          code: "WRONG_DATA",
-          message: "TestModel ID is missing.",
-          status: 400
+          type: "INVALID",
+          code: "INVALID_TESTMODEL_ID",
+          message: "TestModel ID is invalid.",
         });
     });
 
@@ -249,11 +246,11 @@ describe("Mongo Data Service", () => {
       id = "something";
 
       return expect(sut())
-        .to.eventually.be.rejectedWith(ValidationError)
+        .to.eventually.be.rejectedWith(Error)
         .to.include({
+          type: "INVALID",
           code: "INVALID_TESTMODEL_ID",
           message: "TestModel ID is invalid.",
-          status: 400
         });
     });
 
@@ -278,11 +275,11 @@ describe("Mongo Data Service", () => {
       existingDocument = null;
 
       return expect(sut())
-        .to.eventually.be.rejectedWith(ValidationError)
+        .to.eventually.be.rejectedWith(Error)
         .to.include({
+          type: "NOT_FOUND",
           code: "NOT_FOUND",
           message: "TestModel not found",
-          status: 404
         });
     });
 

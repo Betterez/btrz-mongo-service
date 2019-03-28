@@ -1,6 +1,6 @@
 {
   "name": "btrz-mongo-service",
-  "version": "1.3.2",
+  "version": "1.4.0",
   "description": "Betterez specific Mongo data-access service",
   "main": "index.js",
   "scripts": {
@@ -24,9 +24,6 @@
     "url": "https://github.com/Betterez/btrz-mongo-service/issues"
   },
   "homepage": "https://github.com/Betterez/btrz-mongo-service#readme",
-  "dependencies": {
-    "btrz-http-service": "^1.3.0"
-  },
   "devDependencies": {
     "chance": "^1.0.16",
     "chai": "latest",
