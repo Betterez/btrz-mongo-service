@@ -24,13 +24,14 @@
     "url": "https://github.com/Betterez/btrz-mongo-service/issues"
   },
   "homepage": "https://github.com/Betterez/btrz-mongo-service#readme",
+  "dependencies": {},
   "devDependencies": {
     "chance": "^1.0.16",
     "chai": "latest",
     "chai-as-promised": "latest",
     "mocha": "latest",
     "sinon": "latest",
-    "btrz-simple-dao": "^3.0.1",
+    "btrz-simple-dao": "^4.0.0",
     "eslint-config-btrz": "^1.1.2",
     "eslint": "^4.19.1 || ^5.3.0",
     "eslint-plugin-import": "^2.16.0",
