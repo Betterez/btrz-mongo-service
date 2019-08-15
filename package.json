@@ -1,6 +1,6 @@
 {
   "name": "btrz-mongo-service",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "description": "Betterez specific Mongo data-access service",
   "main": "index.js",
   "scripts": {
