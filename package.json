@@ -31,7 +31,7 @@
     "chai-as-promised": "latest",
     "mocha": "latest",
     "sinon": "latest",
-    "btrz-simple-dao": "^4.0.0",
+    "btrz-simple-dao": "^4.1.0",
     "eslint-config-btrz": "^1.1.2",
     "eslint": "^4.19.1 || ^5.3.0",
     "eslint-plugin-import": "^2.16.0",
