@@ -1,12 +1,11 @@
 {
   "name": "btrz-mongo-service",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "description": "Betterez specific Mongo data-access service",
   "main": "index.js",
   "scripts": {
     "test": "NODE_ENV=test mocha --ui bdd -t 50000 test/*.js --exit",
-    "test-w": "NODE_ENV=test node_modules/mocha/bin/mocha -w test/*.js",
-    "lint": "eslint --ext .js, src lib"
+    "test-w": "NODE_ENV=test node_modules/mocha/bin/mocha -w test/*.js"
   },
   "repository": {
     "type": "git",
@@ -26,17 +25,17 @@
   "homepage": "https://github.com/Betterez/btrz-mongo-service#readme",
   "dependencies": {},
   "devDependencies": {
-    "chance": "^1.0.16",
+    "chance": "1.1.8",
     "chai": "latest",
     "chai-as-promised": "latest",
     "mocha": "latest",
     "sinon": "latest",
-    "btrz-simple-dao": "^4.1.0",
-    "eslint-config-btrz": "^1.1.2",
-    "eslint": "^4.19.1 || ^5.3.0",
-    "eslint-plugin-import": "^2.16.0",
-    "eslint-plugin-html": "^5.0.3",
-    "eslint-plugin-mocha": "^5.2.1",
-    "eslint-plugin-vue": "^5.1.0"
+    "btrz-simple-dao": "4.3.0",
+    "confusing-browser-globals": "^1.0.10",
+    "eslint": "7.32.0",
+    "eslint-config-btrz-base": "^1.0.0",
+    "eslint-plugin-chai-friendly": "^0.4.1",
+    "eslint-plugin-import": "^2.20.1",
+    "eslint-plugin-mocha": "^5.3.0"
   }
 }
