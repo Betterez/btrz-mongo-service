@@ -1,31 +1,38 @@
-describe("Mongo Data Service", () => {
-  const sinon = require("sinon");
-  const chai = require("chai");
-  const chaiAsPromised = require("chai-as-promised");
-  chai.use(chaiAsPromised);
-  const {expect} = chai;
+const assert = require("node:assert/strict");
+const {describe, it, beforeEach, afterEach} = require("node:test");
+const sinon = require("sinon");
 
-  const {MongoDataService} = require("../index");
-  const {SimpleDao} = require("btrz-simple-dao");
+const {MongoDataService} = require("../index");
+const {SimpleDao} = require("btrz-simple-dao");
 
-  class TestModel {
-    static factory(data) {
-      const model = new TestModel();
-      model.something = data.something;
-      return model;
-    }
-    static update(model, dto) {
-      model.something = dto.something;
-      model.updatedAt = "now";
-      return model;
-    }
+class TestModel {
+  static factory(data) {
+    const model = new TestModel();
+    model.something = data.something;
+    return model;
   }
 
+  static update(model, dto) {
+    model.something = dto.something;
+    model.updatedAt = "now";
+    return model;
+  }
+}
+
+function assertInvalidIdError(err) {
+  assert.strictEqual(err.type, "INVALID");
+  assert.strictEqual(err.code, "INVALID_TESTMODEL_ID");
+  assert.strictEqual(err.message, "TestModel ID is invalid.");
+  return true;
+}
+
+describe("Mongo Data Service", () => {
   let sandbox = null;
   let dao = null;
   let config = null;
   let service = null;
   let id = null;
+
   beforeEach(() => {
     sandbox = sinon.createSandbox();
     dao = {
@@ -44,8 +51,12 @@ describe("Mongo Data Service", () => {
     id = SimpleDao.objectId().toString();
   });
 
+  afterEach(() => {
+    sandbox.restore();
+  });
+
   it("should be called MongoDataService", () => {
-    expect(MongoDataService.name).to.equal("MongoDataService");
+    assert.strictEqual(MongoDataService.name, "MongoDataService");
   });
 
   describe("constructor", () => {
@@ -55,21 +66,21 @@ describe("Mongo Data Service", () => {
 
     it("should fail if dao is not in dependencies", () => {
       dao = null;
-      expect(sut).to.throw("dao is mandatory for MongoDataService");
+      assert.throws(sut, /dao is mandatory for MongoDataService/);
     });
 
     it("should fail if dao in dependencies is not a valid dao (has for method)", () => {
       dao.for = null;
-      expect(sut).to.throw("dao is mandatory for MongoDataService");
+      assert.throws(sut, /dao is mandatory for MongoDataService/);
     });
 
     it("should fail if config is not in dependencies", () => {
       config = null;
-      expect(sut).to.throw("config is mandatory for MongoDataService");
+      assert.throws(sut, /config is mandatory for MongoDataService/);
     });
 
     it("should create an instance of MongoDataService", () => {
-      expect(sut()).to.be.an.instanceof(MongoDataService);
+      assert.ok(sut() instanceof MongoDataService);
     });
   });
 
@@ -86,38 +97,25 @@ describe("Mongo Data Service", () => {
 
     it("should fail if ID is missing", () => {
       id = null;
-      return expect(sut())
-        .to.eventually.be.rejectedWith(Error)
-        .to.include({
-          type: "INVALID",
-          code: "INVALID_TESTMODEL_ID",
-          message: "TestModel ID is invalid.",
-        });
+      return assert.rejects(sut, assertInvalidIdError);
     });
 
     it("should fail if ID is an invalid Mongo objectId", () => {
       id = "something";
-
-      return expect(sut())
-        .to.eventually.be.rejectedWith(Error)
-        .to.include({
-          type: "INVALID",
-          code: "INVALID_TESTMODEL_ID",
-          message: "TestModel ID is invalid.",
-        });
+      return assert.rejects(sut, assertInvalidIdError);
     });
 
     it("should call the dao findById with the Model and id", async () => {
       await sut();
-      expect(dao.for.calledOnce).to.equal(true);
-      expect(dao.for.firstCall.args[0]).to.be.eql(TestModel);
-      expect(dao.findById.calledOnce).to.equal(true);
-      expect(dao.findById.firstCall.args[0]).to.equal(id);
+      assert.strictEqual(dao.for.calledOnce, true);
+      assert.deepStrictEqual(dao.for.firstCall.args[0], TestModel);
+      assert.strictEqual(dao.findById.calledOnce, true);
+      assert.strictEqual(dao.findById.firstCall.args[0], id);
     });
 
     it("should return the document found from the database", async () => {
       const found = await sut();
-      expect(found).to.deep.equal(dbDocument);
+      assert.deepStrictEqual(found, dbDocument);
     });
   });
 
@@ -128,33 +126,20 @@ describe("Mongo Data Service", () => {
 
     it("should fail if ID is missing", () => {
       id = null;
-      return expect(sut())
-        .to.eventually.be.rejectedWith(Error)
-        .to.include({
-          type: "INVALID",
-          code: "INVALID_TESTMODEL_ID",
-          message: "TestModel ID is invalid.",
-        });
+      return assert.rejects(sut, assertInvalidIdError);
     });
 
     it("should fail if ID is an invalid Mongo objectId", () => {
       id = "something";
-
-      return expect(sut())
-        .to.eventually.be.rejectedWith(Error)
-        .to.include({
-          type: "INVALID",
-          code: "INVALID_TESTMODEL_ID",
-          message: "TestModel ID is invalid.",
-        });
+      return assert.rejects(sut, assertInvalidIdError);
     });
 
     it("should call the dao findById with the Model and id", async () => {
       await sut();
-      expect(dao.for.calledOnce).to.equal(true);
-      expect(dao.for.firstCall.args[0]).to.be.eql(TestModel);
-      expect(dao.removeById.calledOnce).to.equal(true);
-      expect(dao.removeById.firstCall.args[0]).to.equal(id);
+      assert.strictEqual(dao.for.calledOnce, true);
+      assert.deepStrictEqual(dao.for.firstCall.args[0], TestModel);
+      assert.strictEqual(dao.removeById.calledOnce, true);
+      assert.strictEqual(dao.removeById.firstCall.args[0], id);
     });
   });
 
@@ -171,50 +156,35 @@ describe("Mongo Data Service", () => {
 
     it("should fail if ID is missing", () => {
       id = null;
-      return expect(sut())
-        .to.eventually.be.rejectedWith(Error)
-        .to.include({
-          type: "INVALID",
-          code: "INVALID_TESTMODEL_ID",
-          message: "TestModel ID is invalid.",
-        });
+      return assert.rejects(sut, assertInvalidIdError);
     });
 
     it("should fail if ID is an invalid Mongo objectId", () => {
       id = "something";
-
-      return expect(sut())
-        .to.eventually.be.rejectedWith(Error)
-        .to.include({
-          type: "INVALID",
-          code: "INVALID_TESTMODEL_ID",
-          message: "TestModel ID is invalid.",
-        });
+      return assert.rejects(sut, assertInvalidIdError);
     });
 
     it("should call the dao findById with the Model and id", async () => {
       await sut();
-      expect(dao.for.calledOnce).to.equal(true);
-      expect(dao.for.firstCall.args[0]).to.be.eql(TestModel);
-      expect(dao.findById.calledOnce).to.equal(true);
-      expect(dao.findById.firstCall.args[0]).to.equal(id);
+      assert.strictEqual(dao.for.calledOnce, true);
+      assert.deepStrictEqual(dao.for.firstCall.args[0], TestModel);
+      assert.strictEqual(dao.findById.calledOnce, true);
+      assert.strictEqual(dao.findById.firstCall.args[0], id);
     });
 
     it("should return the document found from the database", async () => {
       const found = await sut();
-      expect(found).to.deep.equal(dbDocument);
+      assert.deepStrictEqual(found, dbDocument);
     });
 
     it("should fail if document was not found", () => {
       dbDocument = null;
-
-      return expect(sut())
-        .to.eventually.be.rejectedWith(Error)
-        .to.include({
-          type: "NOT_FOUND",
-          code: "NOT_FOUND",
-          message: "TestModel not found",
-        });
+      return assert.rejects(sut, (err) => {
+        assert.strictEqual(err.type, "NOT_FOUND");
+        assert.strictEqual(err.code, "NOT_FOUND");
+        assert.strictEqual(err.message, "TestModel not found");
+        return true;
+      });
     });
   });
 
@@ -233,60 +203,44 @@ describe("Mongo Data Service", () => {
 
     it("should fail if ID is missing", () => {
       id = null;
-      return expect(sut())
-        .to.eventually.be.rejectedWith(Error)
-        .to.include({
-          type: "INVALID",
-          code: "INVALID_TESTMODEL_ID",
-          message: "TestModel ID is invalid.",
-        });
+      return assert.rejects(sut, assertInvalidIdError);
     });
 
     it("should fail if ID is an invalid Mongo objectId", () => {
       id = "something";
-
-      return expect(sut())
-        .to.eventually.be.rejectedWith(Error)
-        .to.include({
-          type: "INVALID",
-          code: "INVALID_TESTMODEL_ID",
-          message: "TestModel ID is invalid.",
-        });
+      return assert.rejects(sut, assertInvalidIdError);
     });
 
     it("should fail if update data is missing", () => {
       data = null;
-      return expect(sut())
-        .to.eventually.be.rejectedWith(Error)
-        .to.include({
-          message: "The data is required for update"
-        });
+      return assert.rejects(sut, (err) => {
+        assert.strictEqual(err.message, "The data is required for update");
+        return true;
+      });
     });
 
     it("should call the dao findById with the Model and id", async () => {
       await sut();
-      expect(dao.for.calledOnce).to.equal(true);
-      expect(dao.for.firstCall.args[0]).to.be.eql(TestModel);
-      expect(dao.findById.calledOnce).to.equal(true);
-      expect(dao.findById.firstCall.args[0]).to.equal(id);
+      assert.strictEqual(dao.for.calledOnce, true);
+      assert.deepStrictEqual(dao.for.firstCall.args[0], TestModel);
+      assert.strictEqual(dao.findById.calledOnce, true);
+      assert.strictEqual(dao.findById.firstCall.args[0], id);
     });
 
     it("should fail if document was not found", () => {
       existingDocument = null;
-
-      return expect(sut())
-        .to.eventually.be.rejectedWith(Error)
-        .to.include({
-          type: "NOT_FOUND",
-          code: "NOT_FOUND",
-          message: "TestModel not found",
-        });
+      return assert.rejects(sut, (err) => {
+        assert.strictEqual(err.type, "NOT_FOUND");
+        assert.strictEqual(err.code, "NOT_FOUND");
+        assert.strictEqual(err.message, "TestModel not found");
+        return true;
+      });
     });
 
     it("should update and save the document found", async () => {
       await sut();
-      expect(dao.save.calledOnce).to.equal(true);
-      expect(dao.save.firstCall.args[0]).to.deep.equal({
+      assert.strictEqual(dao.save.calledOnce, true);
+      assert.deepStrictEqual(dao.save.firstCall.args[0], {
         something: "new",
         updatedAt: "now"
       });
@@ -331,7 +285,10 @@ describe("Mongo Data Service", () => {
     });
 
     it("should return a promise with an integer", () => {
-      return expect(sut()).to.eventually.equal(5);
+      return assert.doesNotReject(async () => {
+        const count = await sut();
+        assert.strictEqual(count, 5);
+      });
     });
 
     it("should return a rejected promise if cursor fails", () => {
@@ -341,9 +298,10 @@ describe("Mongo Data Service", () => {
         }
         return this;
       };
-      return expect(sut())
-        .to.eventually.be.rejectedWith(Error)
-        .to.include({message: "mongo cursor error"});
+      return assert.rejects(sut, (err) => {
+        assert.strictEqual(err.message, "mongo cursor error");
+        return true;
+      });
     });
 
     it("should resolve to zero if cursor ends with no results", () => {
@@ -353,7 +311,10 @@ describe("Mongo Data Service", () => {
         }
         return this;
       };
-      return expect(sut()).to.eventually.equal(0);
+      return assert.doesNotReject(async () => {
+        const count = await sut();
+        assert.strictEqual(count, 0);
+      });
     });
   });
 
@@ -393,7 +354,7 @@ describe("Mongo Data Service", () => {
     it("should return an object with a list and count", () => {
       return sut()
         .then((result) => {
-          expect(result).to.deep.equal({
+          assert.deepStrictEqual(result, {
             list: listResult,
             count: countResult
           });
@@ -403,10 +364,10 @@ describe("Mongo Data Service", () => {
     it("should call count and find with same query and options", () => {
       return sut()
         .then(() => {
-          expect(dao.find.callCount).to.equal(1);
-          expect(dao.find.firstCall.args).to.deep.equal([{accountId}, {}]);
-          expect(dao.count.callCount).to.equal(1);
-          expect(dao.count.firstCall.args).to.deep.equal([{accountId}]);
+          assert.strictEqual(dao.find.callCount, 1);
+          assert.deepStrictEqual(dao.find.firstCall.args, [{accountId}, {}]);
+          assert.strictEqual(dao.count.callCount, 1);
+          assert.deepStrictEqual(dao.count.firstCall.args, [{accountId}]);
         });
     });
   });
