@@ -1,6 +1,5 @@
 const assert = require("node:assert/strict");
-const {describe, it, beforeEach, afterEach} = require("node:test");
-const sinon = require("sinon");
+const {describe, it, beforeEach, afterEach, mock} = require("node:test");
 
 const {MongoDataService} = require("../index");
 const {SimpleDao} = require("btrz-simple-dao");
@@ -27,24 +26,22 @@ function assertInvalidIdError(err) {
 }
 
 describe("Mongo Data Service", () => {
-  let sandbox = null;
   let dao = null;
   let config = null;
   let service = null;
   let id = null;
 
   beforeEach(() => {
-    sandbox = sinon.createSandbox();
     dao = {
-      for: sandbox.spy(function () { return this; }),
-      find: sandbox.spy(function () { return this; }),
+      for: mock.fn(function () { return this; }),
+      find: mock.fn(function () { return this; }),
       findAggregate: function () { return this; },
-      findById: sandbox.stub().resolves(),
-      count: sandbox.stub().resolves(0),
-      save: sandbox.stub().resolves(),
-      removeById: sandbox.stub().resolves(),
-      toArray: sandbox.stub().resolves(),
-      objectId: sandbox.spy(_id => SimpleDao.objectId(_id))
+      findById: mock.fn(async () => undefined),
+      count: mock.fn(async () => 0),
+      save: mock.fn(async () => undefined),
+      removeById: mock.fn(async () => undefined),
+      toArray: mock.fn(async () => undefined),
+      objectId: mock.fn((_id) => SimpleDao.objectId(_id))
     };
     config = {};
     service = new MongoDataService(dao, config);
@@ -52,7 +49,7 @@ describe("Mongo Data Service", () => {
   });
 
   afterEach(() => {
-    sandbox.restore();
+    mock.restoreAll();
   });
 
   it("should be called MongoDataService", () => {
@@ -92,7 +89,7 @@ describe("Mongo Data Service", () => {
     let dbDocument = null;
     beforeEach(() => {
       dbDocument = {something: "important"};
-      dao.findById = sandbox.stub().resolves(dbDocument);
+      dao.findById = mock.fn(async () => dbDocument);
     });
 
     it("should fail if ID is missing", () => {
@@ -107,10 +104,10 @@ describe("Mongo Data Service", () => {
 
     it("should call the dao findById with the Model and id", async () => {
       await sut();
-      assert.strictEqual(dao.for.calledOnce, true);
-      assert.deepStrictEqual(dao.for.firstCall.args[0], TestModel);
-      assert.strictEqual(dao.findById.calledOnce, true);
-      assert.strictEqual(dao.findById.firstCall.args[0], id);
+      assert.strictEqual(dao.for.mock.callCount(), 1);
+      assert.deepStrictEqual(dao.for.mock.calls[0].arguments[0], TestModel);
+      assert.strictEqual(dao.findById.mock.callCount(), 1);
+      assert.strictEqual(dao.findById.mock.calls[0].arguments[0], id);
     });
 
     it("should return the document found from the database", async () => {
@@ -136,10 +133,10 @@ describe("Mongo Data Service", () => {
 
     it("should call the dao findById with the Model and id", async () => {
       await sut();
-      assert.strictEqual(dao.for.calledOnce, true);
-      assert.deepStrictEqual(dao.for.firstCall.args[0], TestModel);
-      assert.strictEqual(dao.removeById.calledOnce, true);
-      assert.strictEqual(dao.removeById.firstCall.args[0], id);
+      assert.strictEqual(dao.for.mock.callCount(), 1);
+      assert.deepStrictEqual(dao.for.mock.calls[0].arguments[0], TestModel);
+      assert.strictEqual(dao.removeById.mock.callCount(), 1);
+      assert.strictEqual(dao.removeById.mock.calls[0].arguments[0], id);
     });
   });
 
@@ -151,7 +148,7 @@ describe("Mongo Data Service", () => {
     let dbDocument = null;
     beforeEach(() => {
       dbDocument = {something: "important"};
-      dao.findById = sandbox.spy(() => Promise.resolve(dbDocument));
+      dao.findById = mock.fn(() => Promise.resolve(dbDocument));
     });
 
     it("should fail if ID is missing", () => {
@@ -166,10 +163,10 @@ describe("Mongo Data Service", () => {
 
     it("should call the dao findById with the Model and id", async () => {
       await sut();
-      assert.strictEqual(dao.for.calledOnce, true);
-      assert.deepStrictEqual(dao.for.firstCall.args[0], TestModel);
-      assert.strictEqual(dao.findById.calledOnce, true);
-      assert.strictEqual(dao.findById.firstCall.args[0], id);
+      assert.strictEqual(dao.for.mock.callCount(), 1);
+      assert.deepStrictEqual(dao.for.mock.calls[0].arguments[0], TestModel);
+      assert.strictEqual(dao.findById.mock.callCount(), 1);
+      assert.strictEqual(dao.findById.mock.calls[0].arguments[0], id);
     });
 
     it("should return the document found from the database", async () => {
@@ -198,7 +195,7 @@ describe("Mongo Data Service", () => {
     beforeEach(() => {
       existingDocument = {something: "important"};
       data = {something: "new"};
-      dao.findById = sandbox.spy(() => Promise.resolve(existingDocument));
+      dao.findById = mock.fn(() => Promise.resolve(existingDocument));
     });
 
     it("should fail if ID is missing", () => {
@@ -221,10 +218,10 @@ describe("Mongo Data Service", () => {
 
     it("should call the dao findById with the Model and id", async () => {
       await sut();
-      assert.strictEqual(dao.for.calledOnce, true);
-      assert.deepStrictEqual(dao.for.firstCall.args[0], TestModel);
-      assert.strictEqual(dao.findById.calledOnce, true);
-      assert.strictEqual(dao.findById.firstCall.args[0], id);
+      assert.strictEqual(dao.for.mock.callCount(), 1);
+      assert.deepStrictEqual(dao.for.mock.calls[0].arguments[0], TestModel);
+      assert.strictEqual(dao.findById.mock.callCount(), 1);
+      assert.strictEqual(dao.findById.mock.calls[0].arguments[0], id);
     });
 
     it("should fail if document was not found", () => {
@@ -239,8 +236,8 @@ describe("Mongo Data Service", () => {
 
     it("should update and save the document found", async () => {
       await sut();
-      assert.strictEqual(dao.save.calledOnce, true);
-      assert.deepStrictEqual(dao.save.firstCall.args[0], {
+      assert.strictEqual(dao.save.mock.callCount(), 1);
+      assert.deepStrictEqual(dao.save.mock.calls[0].arguments[0], {
         something: "new",
         updatedAt: "now"
       });
@@ -277,7 +274,7 @@ describe("Mongo Data Service", () => {
     let cursor = null;
     beforeEach(() => {
       cursor = new ResultsCursorMock();
-      dao.toCursor = sandbox.spy(() => Promise.resolve(cursor));
+      dao.toCursor = mock.fn(() => Promise.resolve(cursor));
       query = [
         {$match: {accountId: "account-id"}},
         { $group: { _id: null, "total_documents": { $sum: 1 } } }
@@ -343,8 +340,8 @@ describe("Mongo Data Service", () => {
       model = new TestModel();
       listResult = [{_id: "1"}, {_id: "2"}];
       countResult = listResult.length;
-      dao.toArray = sandbox.spy(() => Promise.resolve(listResult));
-      dao.count = sandbox.spy(() => Promise.resolve(countResult));
+      dao.toArray = mock.fn(() => Promise.resolve(listResult));
+      dao.count = mock.fn(() => Promise.resolve(countResult));
     });
 
     function sut() {
@@ -364,10 +361,10 @@ describe("Mongo Data Service", () => {
     it("should call count and find with same query and options", () => {
       return sut()
         .then(() => {
-          assert.strictEqual(dao.find.callCount, 1);
-          assert.deepStrictEqual(dao.find.firstCall.args, [{accountId}, {}]);
-          assert.strictEqual(dao.count.callCount, 1);
-          assert.deepStrictEqual(dao.count.firstCall.args, [{accountId}]);
+          assert.strictEqual(dao.find.mock.callCount(), 1);
+          assert.deepStrictEqual(dao.find.mock.calls[0].arguments, [{accountId}, {}]);
+          assert.strictEqual(dao.count.mock.callCount(), 1);
+          assert.deepStrictEqual(dao.count.mock.calls[0].arguments, [{accountId}]);
         });
     });
   });

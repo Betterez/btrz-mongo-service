@@ -29,7 +29,6 @@
   "homepage": "https://github.com/Betterez/btrz-mongo-service#readme",
   "dependencies": {},
   "devDependencies": {
-    "sinon": "22.0.0",
     "btrz-simple-dao": "4.6.0",
     "eslint": "10.6.0",
     "eslint-config-btrz-base": "^2.0.0"
